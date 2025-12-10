@@ -210,8 +210,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 // Protected endpoint requires valid JWT
-app.MapGet("/weatherforecast", (HttpContext ctx) => { ... })
-   .RequireAuthorization();
+app.MapGet("/weatherforecast", (HttpContext ctx) => {
+    // Extract user identity from JWT claims
+    var userIdentity = ctx.User.FindFirst("name")?.Value 
+        ?? ctx.User.FindFirst("preferred_username")?.Value 
+        ?? ctx.User.Identity?.Name 
+        ?? "Anonymous";
+    
+    var userId = ctx.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value 
+        ?? ctx.User.FindFirst("oid")?.Value 
+        ?? "Unknown";
+    
+    // Return weather data with user context
+    return new { forecasts, requestedBy = userIdentity, userId };
+})
+.RequireAuthorization();
 ```
 
 ### Aspire AppHost Configuration (`AppHost.cs`)
@@ -241,6 +254,13 @@ var angularApp = builder.AddNpmApp("angular-spa", "../AuthSpa2.Angular")
 - Check that Angular is requesting the correct scope
 - Verify the audience in API configuration matches ClientId
 - Inspect the JWT token in browser console (click "View Token")
+
+### Issue: User identity shows as "Anonymous"
+**Solution**: Microsoft Entra ID JWT tokens use full URI claim types. The API checks multiple claim names in order:
+- `name` - User's display name
+- `preferred_username` - User's email/UPN
+- `http://schemas.microsoft.com/identity/claims/objectidentifier` - User's unique ID
+- `oid` - Alternative object identifier claim
 
 ### Issue: CORS errors
 **Solution**: The API already has CORS configured for development. Ensure Angular is running on the expected port.
