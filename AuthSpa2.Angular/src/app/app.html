@@ -20,6 +20,9 @@
         <button (click)="callApi()" class="btn btn-success" [disabled]="loading">
           {{ loading ? 'Loading...' : 'Call Protected API' }}
         </button>
+        <button (click)="callBackendService()" class="btn btn-primary" [disabled]="loadingBackend">
+          {{ loadingBackend ? 'Loading...' : 'Call Backend Service' }}
+        </button>
         <button (click)="getToken()" class="btn btn-info">View Token (Console)</button>
         <button (click)="logout()" class="btn btn-secondary">Sign Out</button>
       </div>
@@ -56,6 +59,43 @@
   <div *ngIf="error" class="error">
     <h3>❌ Error</h3>
     <p>{{ error }}</p>
+  </div>
+
+  <!-- Backend Service Response -->
+  <div *ngIf="backendData" class="api-response">
+    <h3>Backend Protected Service Response</h3>
+    <p><strong>Message:</strong> {{ backendData.message }}</p>
+    <p><strong>Called by:</strong> {{ backendData.calledBy }}</p>
+    
+    <div *ngIf="backendData.backendResponse">
+      <h4>Backend Service Data:</h4>
+      <p><strong>Requested by (from backend):</strong> {{ backendData.backendResponse.requestedBy }}</p>
+      <p><strong>User ID:</strong> {{ backendData.backendResponse.userId }}</p>
+      <p><strong>Timestamp:</strong> {{ backendData.backendResponse.timestamp }}</p>
+      
+      <table *ngIf="backendData.backendResponse.data">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of backendData.backendResponse.data">
+            <td>{{ item.id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.value }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Backend Error Display -->
+  <div *ngIf="backendError" class="error">
+    <h3>❌ Backend Service Error</h3>
+    <p>{{ backendError }}</p>
   </div>
 
   <!-- Configuration Info -->

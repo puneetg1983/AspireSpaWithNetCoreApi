@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AuthSpa2.ApiService\AuthSpa2.ApiService.csproj" />
+    <ProjectReference Include="..\AuthSpa2.BackendProtectedService\AuthSpa2.BackendProtectedService.csproj" />
   </ItemGroup>
 
   <ItemGroup>

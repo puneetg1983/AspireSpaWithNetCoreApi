@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.ServiceEssentials;
 using Microsoft.Identity.Web;
+using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,13 @@ builder.Services.AddAuthentication(MiseAuthenticationDefaults.AuthenticationSche
     .AddMiseWithDefaultModules(builder.Configuration);
 
 builder.Services.AddAuthorization();
+
+// Add HttpClient for calling BackendProtectedService
+builder.Services.AddHttpClient("BackendProtectedService", client =>
+{
+    // This will be configured by Aspire service discovery
+    client.BaseAddress = new Uri("https+http://backendprotectedservice");
+});
 
 // Add CORS services
 builder.Services.AddCors();
@@ -79,6 +87,63 @@ app.MapGet("/weatherforecast", (HttpContext httpContext) =>
 })
 .WithName("GetWeatherForecast")
 .RequireAuthorization(); // This endpoint requires a valid JWT token
+
+// Protected endpoint that calls BackendProtectedService with token forwarding
+app.MapGet("/backenddata", async (HttpContext httpContext, IHttpClientFactory httpClientFactory) =>
+{
+    try
+    {
+        // Get the authorization header from the incoming request
+        var authHeader = httpContext.Request.Headers["Authorization"].ToString();
+        
+        if (string.IsNullOrEmpty(authHeader))
+        {
+            return Results.Unauthorized();
+        }
+
+        var userIdentity = httpContext.User.FindFirst("name")?.Value
+            ?? httpContext.User.FindFirst("preferred_username")?.Value
+            ?? httpContext.User.Identity?.Name
+            ?? "Anonymous";
+
+        // Create HttpClient for BackendProtectedService
+        var httpClient = httpClientFactory.CreateClient("BackendProtectedService");
+        
+        // Forward the bearer token to the backend service
+        httpClient.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse(authHeader);
+
+        // Call the backend service
+        var response = await httpClient.GetAsync("/api/data");
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            return Results.Problem(
+                statusCode: (int)response.StatusCode,
+                title: "Backend service call failed",
+                detail: await response.Content.ReadAsStringAsync()
+            );
+        }
+
+        var backendData = await response.Content.ReadAsStringAsync();
+        
+        return Results.Ok(new
+        {
+            Message = "Data retrieved from BackendProtectedService via ApiService",
+            CalledBy = userIdentity,
+            BackendResponse = System.Text.Json.JsonDocument.Parse(backendData).RootElement
+        });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(
+            statusCode: 500,
+            title: "Error calling backend service",
+            detail: ex.Message
+        );
+    }
+})
+.WithName("GetBackendData")
+.RequireAuthorization();
 
 app.MapDefaultEndpoints();
 

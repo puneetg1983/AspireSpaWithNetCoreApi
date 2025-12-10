@@ -21,8 +21,11 @@ export class App implements OnInit, OnDestroy {
   isAuthenticated = false;
   userName = '';
   weatherData: any = null;
+  backendData: any = null;
   loading = false;
+  loadingBackend = false;
   error = '';
+  backendError = '';
   
   private readonly _destroying$ = new Subject<void>();
 
@@ -125,6 +128,37 @@ export class App implements OnInit, OnDestroy {
           this.error = `API Error: ${err.message || 'Unknown error'}`;
           this.loading = false;
           console.error('API call failed:', err);
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  /**
+   * Call the backend protected service via ApiService with token forwarding
+   * MSAL Interceptor automatically attaches the access token to ApiService
+   * ApiService then forwards the token to BackendProtectedService
+   */
+  callBackendService(): void {
+    this.loadingBackend = true;
+    this.backendError = '';
+    this.backendData = null;
+
+    const apiUrl = 'https://apiservice.dev.localhost:7001/backenddata';
+
+    console.log('Calling Backend Service via API:', apiUrl);
+
+    this.http.get<any>(apiUrl)
+      .subscribe({
+        next: (data) => {
+          this.backendData = data;
+          this.loadingBackend = false;
+          console.log('Backend Service Response:', data);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.backendError = `Backend API Error: ${err.message || 'Unknown error'}`;
+          this.loadingBackend = false;
+          console.error('Backend service call failed:', err);
           this.cdr.detectChanges();
         }
       });
