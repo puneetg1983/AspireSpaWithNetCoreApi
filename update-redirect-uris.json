@@ -1,0 +1,8 @@
+{
+  "spa": {
+    "redirectUris": [
+      "http://localhost:4200",
+      "https://angular-spa-authspa2.dev.localhost:4200"
+    ]
+  }
+}

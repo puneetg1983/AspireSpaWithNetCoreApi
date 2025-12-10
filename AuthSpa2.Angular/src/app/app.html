@@ -1,0 +1,71 @@
+<div class="container">
+  <header>
+    <h1>{{ title }}</h1>
+    <p class="subtitle">Single Entra ID App with PKCE Flow</p>
+  </header>
+
+  <!-- Authentication Status -->
+  <div class="auth-section">
+    <div *ngIf="!isAuthenticated" class="not-authenticated">
+      <h2>🔒 Not Authenticated</h2>
+      <p>Please sign in to access the protected API</p>
+      <button (click)="login()" class="btn btn-primary">Sign In with Microsoft</button>
+    </div>
+
+    <div *ngIf="isAuthenticated" class="authenticated">
+      <h2>✅ Authenticated</h2>
+      <p><strong>User:</strong> {{ userName }}</p>
+      
+      <div class="button-group">
+        <button (click)="callApi()" class="btn btn-success" [disabled]="loading">
+          {{ loading ? 'Loading...' : 'Call Protected API' }}
+        </button>
+        <button (click)="getToken()" class="btn btn-info">View Token (Console)</button>
+        <button (click)="logout()" class="btn btn-secondary">Sign Out</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Response -->
+  <div *ngIf="weatherData" class="api-response">
+    <h3>Weather Forecast from API</h3>
+    <p><strong>Requested by:</strong> {{ weatherData.user }}</p>
+    <p><strong>User ID:</strong> {{ weatherData.userId }}</p>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Temp (C)</th>
+          <th>Temp (F)</th>
+          <th>Summary</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of weatherData.forecast">
+          <td>{{ item.date }}</td>
+          <td>{{ item.temperatureC }}</td>
+          <td>{{ item.temperatureF }}</td>
+          <td>{{ item.summary }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Error Display -->
+  <div *ngIf="error" class="error">
+    <h3>❌ Error</h3>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Configuration Info -->
+  <div class="config-info">
+    <h3>Configuration Details</h3>
+    <ul>
+      <li><strong>Client ID:</strong> 1d922779-2742-4cf2-8c82-425cf2c60aa8</li>
+      <li><strong>Authority:</strong> https://login.microsoftonline.com/common</li>
+      <li><strong>Scopes:</strong> openid, profile, api://1d922779-2742-4cf2-8c82-425cf2c60aa8/access_as_user</li>
+      <li><strong>Flow:</strong> Authorization Code with PKCE (no client secret)</li>
+    </ul>
+  </div>
+</div>
