@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Identity.ServiceEssentials.AspNetCore" Version="2.0.0-rc.3" />
     <PackageReference Include="Microsoft.Identity.Web" Version="4.1.1" />
   </ItemGroup>
 

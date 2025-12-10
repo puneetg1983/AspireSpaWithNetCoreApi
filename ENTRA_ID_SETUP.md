@@ -84,15 +84,61 @@ Choose one:
 
 ---
 
-### 5. 📋 Token Configuration (Optional but Recommended)
+### 5. 📋 Token Configuration (REQUIRED for MISE)
 
 Navigate to: **App Registration → Token configuration**
+
+**CRITICAL - Required for MISE Authentication**:
+- ✅ **`idtyp`** - Token type identifier (REQUIRED by MISE)
 
 **Optional claims to add**:
 - `email` - User's email address
 - `preferred_username` - User's preferred username
 - `family_name` - User's last name
 - `given_name` - User's first name
+
+**Steps to add `idtyp` claim**:
+1. Click **+ Add optional claim**
+2. Select **Access** token type
+3. Check ✅ **idtyp**
+4. Click **Add**
+
+---
+
+### 6. 🔧 App Manifest Configuration (REQUIRED for MISE)
+
+Navigate to: **App Registration → Manifest**
+
+**CRITICAL - Update these manifest properties**:
+
+```json
+{
+  "accessTokenAcceptedVersion": 2,
+  "optionalClaims": {
+    "idToken": [],
+    "accessToken": [
+      {
+        "name": "idtyp",
+        "source": null,
+        "essential": false,
+        "additionalProperties": [
+          "include_user_token"
+        ]
+      }
+    ],
+    "saml2Token": []
+  }
+}
+```
+
+**Explanation**:
+- `accessTokenAcceptedVersion: 2` - Issues v2.0 tokens (required for MISE)
+- `idtyp` optional claim - Identifies token type (required by MISE to distinguish app vs user tokens)
+
+Without these settings, MISE will fail with error:
+```
+MISE12021: The 'idtyp' claim is required but was not present in the token
+```
 
 ---
 

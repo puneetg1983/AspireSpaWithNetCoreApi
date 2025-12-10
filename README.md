@@ -1,8 +1,8 @@
-# AuthSpa2 - Angular SPA with ASP.NET Core API using Microsoft Aspire 13
+# AuthSpa2 - Angular SPA with ASP.NET Core API using Microsoft Aspire 13 & MISE
 
 This project demonstrates a complete authentication flow using:
 - **Angular SPA** with MSAL.js (Authorization Code Flow with PKCE)
-- **ASP.NET Core API** with Microsoft.Identity.Web (JWT Bearer authentication)
+- **ASP.NET Core API** with Microsoft.Identity.ServiceEssentials (MISE) for JWT Bearer authentication
 - **Microsoft Aspire 13** for service orchestration
 - **Single Microsoft Entra ID App Registration** (no client secrets)
 
@@ -13,7 +13,7 @@ This project demonstrates a complete authentication flow using:
 │   Angular SPA       │         │  ASP.NET Core API    │
 │   (Port 4200)       │         │  (Dynamic Port)      │
 │                     │         │                      │
-│  - MSAL.js (PKCE)   │────────▶│  - JWT Bearer Auth   │
+│  - MSAL.js (PKCE)   │────────▶│  - MISE Auth         │
 │  - Auto Token       │  Bearer │  - [Authorize]       │
 │    Acquisition      │  Token  │    Endpoints         │
 └─────────────────────┘         └──────────────────────┘
@@ -26,6 +26,8 @@ This project demonstrates a complete authentication flow using:
               │                     │
               │  ClientId:          │
               │  1d922779-...       │
+              │  Token Version: v2  │
+              │  idtyp claim: ✓     │
               └─────────────────────┘
 ```
 
@@ -41,6 +43,8 @@ This project demonstrates a complete authentication flow using:
    - ClientId: `1d922779-2742-4cf2-8c82-425cf2c60aa8`
    - Redirect URI: `http://localhost:4200`
    - Exposed API scope: `api://1d922779-2742-4cf2-8c82-425cf2c60aa8/access_as_user`
+   - **Access Token Version: v2.0** (REQUIRED for MISE)
+   - **Optional Claim: `idtyp`** (REQUIRED for MISE)
    - No client secret (public client / SPA)
 
 ## Microsoft Entra ID App Registration Setup
@@ -74,6 +78,43 @@ This project demonstrates a complete authentication flow using:
 ### Step 4: Supported Account Types
 - Set to **Accounts in any organizational directory (Any Microsoft Entra ID tenant - Multitenant)**
 - Or restrict to your tenant as needed
+
+### Step 5: Token Configuration (CRITICAL for MISE)
+1. Go to **Token configuration**
+2. Click **+ Add optional claim**
+3. Select **Access** token type
+4. Check ✅ **`idtyp`** (REQUIRED by MISE)
+5. Click **Add**
+
+### Step 6: Manifest Configuration (CRITICAL for MISE)
+1. Go to **Manifest**
+2. Find `accessTokenAcceptedVersion` and set to `2`:
+   ```json
+   "accessTokenAcceptedVersion": 2
+   ```
+3. Verify `optionalClaims` includes:
+   ```json
+   "optionalClaims": {
+     "idToken": [],
+     "accessToken": [
+       {
+         "name": "idtyp",
+         "source": null,
+         "essential": false,
+         "additionalProperties": [
+           "include_user_token"
+         ]
+       }
+     ],
+     "saml2Token": []
+   }
+   ```
+4. Click **Save**
+
+**⚠️ IMPORTANT**: Without v2.0 tokens and the `idtyp` claim, MISE authentication will fail with:
+```
+MISE12021: The 'idtyp' claim is required but was not present in the token
+```
 
 ## Project Structure
 
@@ -199,17 +240,17 @@ scopes: [
 ]
 ```
 
-### ASP.NET Core - JWT Validation (`Program.cs`)
+### ASP.NET Core - MISE Authentication (`Program.cs`)
 
 ```csharp
-// Validates tokens from Microsoft Entra ID
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApi(options => {
-        options.Audience = "1d922779-2742-4cf2-8c82-425cf2c60aa8";
-        options.Authority = "https://login.microsoftonline.com/common";
-    });
+// MISE (Microsoft Identity Service Essentials) authentication
+// Validates tokens from Microsoft Entra ID with enhanced security
+builder.Services.AddAuthentication(MiseAuthenticationDefaults.AuthenticationScheme)
+    .AddMiseWithDefaultModules(builder.Configuration);
 
-// Protected endpoint requires valid JWT
+builder.Services.AddAuthorization();
+
+// Protected endpoint requires valid JWT with idtyp claim
 app.MapGet("/weatherforecast", (HttpContext ctx) => {
     // Extract user identity from JWT claims
     var userIdentity = ctx.User.FindFirst("name")?.Value 
@@ -226,6 +267,11 @@ app.MapGet("/weatherforecast", (HttpContext ctx) => {
 })
 .RequireAuthorization();
 ```
+
+**MISE Requirements**:
+- Access tokens must be **v2.0** (`accessTokenAcceptedVersion: 2` in app manifest)
+- Tokens must include **`idtyp`** claim (configured in Token Configuration)
+- Configuration in `appsettings.json` under `AzureAd` section
 
 ### Aspire AppHost Configuration (`AppHost.cs`)
 
@@ -261,6 +307,35 @@ var angularApp = builder.AddNpmApp("angular-spa", "../AuthSpa2.Angular")
 - `preferred_username` - User's email/UPN
 - `http://schemas.microsoft.com/identity/claims/objectidentifier` - User's unique ID
 - `oid` - Alternative object identifier claim
+
+### Issue: MISE authentication fails with "MISE12021: The 'idtyp' claim is required"
+**Solution**: Your Entra ID app must be configured to issue v2.0 tokens with the `idtyp` claim:
+1. Go to **App Registration → Manifest**
+2. Set `"accessTokenAcceptedVersion": 2`
+3. Go to **Token configuration** → Add optional claim → Access → Check `idtyp`
+4. **Important**: After adding the claim via UI, go back to **Manifest** and manually add `"include_user_token"` to the `additionalProperties` array:
+   ```json
+   "optionalClaims": {
+     "idToken": [],
+     "accessToken": [
+       {
+         "name": "idtyp",
+         "source": null,
+         "essential": false,
+         "additionalProperties": [
+           "include_user_token"
+         ]
+       }
+     ],
+     "saml2Token": []
+   }
+   ```
+5. Save and test again
+
+Without these settings, MISE will reject all authentication requests.
+
+### Issue: Geneva telemetry errors in logs
+**Solution**: MISE includes Geneva telemetry which may fail in local development. These are non-fatal warnings and can be ignored in development. The authentication will still work once the `idtyp` claim issue is resolved.
 
 ### Issue: CORS errors
 **Solution**: The API already has CORS configured for development. Ensure Angular is running on the expected port.

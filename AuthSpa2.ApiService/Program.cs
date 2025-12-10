@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Identity.ServiceEssentials;
 using Microsoft.Identity.Web;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,22 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 
-// Add Microsoft Identity Web authentication
-// Validates JWT tokens issued by Microsoft Entra ID
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApi(options =>
-    {
-        // Configure JWT Bearer authentication
-        options.Audience = "1d922779-2742-4cf2-8c82-425cf2c60aa8"; // ClientId as audience
-        options.Authority = $"https://login.microsoftonline.com/{builder.Configuration["AzureAd:TenantId"]}";
-        options.TokenValidationParameters.ValidateAudience = true;
-        options.TokenValidationParameters.ValidateIssuer = true;
-        options.TokenValidationParameters.ValidateLifetime = true;
-    },
-    options =>
-    {
-        builder.Configuration.Bind("AzureAd", options);
-    });
+// Add MISE authentication
+builder.Services.AddAuthentication(MiseAuthenticationDefaults.AuthenticationScheme)
+    .AddMiseWithDefaultModules(builder.Configuration);
 
 builder.Services.AddAuthorization();
 
