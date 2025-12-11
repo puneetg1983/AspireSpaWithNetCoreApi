@@ -18,10 +18,13 @@
       
       <div class="button-group">
         <button (click)="callApi()" class="btn btn-success" [disabled]="loading">
-          {{ loading ? 'Loading...' : 'Call Protected API' }}
+          {{ loading ? 'Loading...' : 'Call ApiService' }}
         </button>
         <button (click)="callBackendService()" class="btn btn-primary" [disabled]="loadingBackend">
-          {{ loadingBackend ? 'Loading...' : 'Call Backend Service' }}
+          {{ loadingBackend ? 'Loading...' : 'Call ApiService → BackendProtectedService' }}
+        </button>
+        <button (click)="callOboService()" class="btn btn-warning" [disabled]="loadingObo">
+          {{ loadingObo ? 'Loading...' : 'Call OBO Service' }}
         </button>
         <button (click)="getToken()" class="btn btn-info">View Token (Console)</button>
         <button (click)="logout()" class="btn btn-secondary">Sign Out</button>
@@ -31,10 +34,40 @@
 
   <!-- API Response -->
   <div *ngIf="weatherData" class="api-response">
-    <h3>Weather Forecast from API</h3>
+    <h3>📡 ApiService Response</h3>
+    <p><strong>Service:</strong> {{ weatherData.service }}</p>
     <p><strong>Requested by:</strong> {{ weatherData.user }}</p>
     <p><strong>User ID:</strong> {{ weatherData.userId }}</p>
     
+    <!-- Roles -->
+    <div *ngIf="weatherData.roles && weatherData.roles.length > 0" class="roles-section">
+      <h4>🎭 User Roles</h4>
+      <ul>
+        <li *ngFor="let role of weatherData.roles">{{ role }}</li>
+      </ul>
+    </div>
+    <p *ngIf="!weatherData.roles || weatherData.roles.length === 0"><em>No roles assigned</em></p>
+    
+    <!-- Claims (collapsible) -->
+    <details class="claims-section">
+      <summary><strong>📋 User Claims ({{ weatherData.claims?.length || 0 }})</strong></summary>
+      <table class="claims-table">
+        <thead>
+          <tr>
+            <th>Claim Type</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let claim of weatherData.claims">
+            <td>{{ claim.type }}</td>
+            <td>{{ claim.value }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </details>
+    
+    <h4>Weather Forecast</h4>
     <table>
       <thead>
         <tr>
@@ -63,16 +96,46 @@
 
   <!-- Backend Service Response -->
   <div *ngIf="backendData" class="api-response">
-    <h3>Backend Protected Service Response</h3>
+    <h3>🔗 ApiService → BackendProtectedService Response</h3>
     <p><strong>Message:</strong> {{ backendData.message }}</p>
     <p><strong>Called by:</strong> {{ backendData.calledBy }}</p>
     
     <div *ngIf="backendData.backendResponse">
-      <h4>Backend Service Data:</h4>
-      <p><strong>Requested by (from backend):</strong> {{ backendData.backendResponse.requestedBy }}</p>
+      <h4>BackendProtectedService Data:</h4>
+      <p><strong>Service:</strong> {{ backendData.backendResponse.service }}</p>
+      <p><strong>Requested by:</strong> {{ backendData.backendResponse.requestedBy }}</p>
       <p><strong>User ID:</strong> {{ backendData.backendResponse.userId }}</p>
       <p><strong>Timestamp:</strong> {{ backendData.backendResponse.timestamp }}</p>
       
+      <!-- Roles -->
+      <div *ngIf="backendData.backendResponse.roles && backendData.backendResponse.roles.length > 0" class="roles-section">
+        <h4>🎭 User Roles</h4>
+        <ul>
+          <li *ngFor="let role of backendData.backendResponse.roles">{{ role }}</li>
+        </ul>
+      </div>
+      <p *ngIf="!backendData.backendResponse.roles || backendData.backendResponse.roles.length === 0"><em>No roles assigned</em></p>
+      
+      <!-- Claims (collapsible) -->
+      <details class="claims-section">
+        <summary><strong>📋 User Claims ({{ backendData.backendResponse.claims?.length || 0 }})</strong></summary>
+        <table class="claims-table">
+          <thead>
+            <tr>
+              <th>Claim Type</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let claim of backendData.backendResponse.claims">
+              <td>{{ claim.type }}</td>
+              <td>{{ claim.value }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </details>
+      
+      <h4>Data Items</h4>
       <table *ngIf="backendData.backendResponse.data">
         <thead>
           <tr>
@@ -96,6 +159,77 @@
   <div *ngIf="backendError" class="error">
     <h3>❌ Backend Service Error</h3>
     <p>{{ backendError }}</p>
+  </div>
+
+  <!-- OBO Service Response -->
+  <div *ngIf="oboData" class="api-response obo-response">
+    <h3>🔄 OBO (On-Behalf-Of) Service Response</h3>
+    <p><strong>Message:</strong> {{ oboData.message }}</p>
+    <p><strong>Called by:</strong> {{ oboData.calledBy }}</p>
+    <p><strong>OBO Flow Info:</strong> {{ oboData.oboFlowInfo }}</p>
+    
+    <div *ngIf="oboData.backendResponse">
+      <h4>BackendServiceAcceptingToken Data:</h4>
+      <p><strong>Message:</strong> {{ oboData.backendResponse.message }}</p>
+      <p><strong>Service:</strong> {{ oboData.backendResponse.service }}</p>
+      <p><strong>Entra App ID:</strong> {{ oboData.backendResponse.entraAppId }}</p>
+      <p><strong>Token Type:</strong> {{ oboData.backendResponse.tokenType }}</p>
+      <p><strong>Requested by:</strong> {{ oboData.backendResponse.requestedBy }}</p>
+      <p><strong>User ID:</strong> {{ oboData.backendResponse.userId }}</p>
+      <p><strong>Timestamp:</strong> {{ oboData.backendResponse.timestamp }}</p>
+      
+      <!-- Roles -->
+      <div *ngIf="oboData.backendResponse.roles && oboData.backendResponse.roles.length > 0" class="roles-section">
+        <h4>🎭 User Roles (from OBO token)</h4>
+        <ul>
+          <li *ngFor="let role of oboData.backendResponse.roles">{{ role }}</li>
+        </ul>
+      </div>
+      <p *ngIf="!oboData.backendResponse.roles || oboData.backendResponse.roles.length === 0"><em>No roles assigned in OBO token</em></p>
+      
+      <!-- Claims (collapsible) -->
+      <details class="claims-section">
+        <summary><strong>📋 User Claims from OBO Token ({{ oboData.backendResponse.claims?.length || 0 }})</strong></summary>
+        <table class="claims-table">
+          <thead>
+            <tr>
+              <th>Claim Type</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let claim of oboData.backendResponse.claims">
+              <td>{{ claim.type }}</td>
+              <td>{{ claim.value }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </details>
+      
+      <h4>Data Items</h4>
+      <table *ngIf="oboData.backendResponse.data">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of oboData.backendResponse.data">
+            <td>{{ item.id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.description }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- OBO Error Display -->
+  <div *ngIf="oboError" class="error">
+    <h3>❌ OBO Service Error</h3>
+    <p>{{ oboError }}</p>
   </div>
 
   <!-- Configuration Info -->

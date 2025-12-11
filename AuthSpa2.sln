@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthSpa2.ApiService", "Auth
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthSpa2.BackendProtectedService", "AuthSpa2.BackendProtectedService\AuthSpa2.BackendProtectedService.csproj", "{20FA2453-4D61-48FB-A5FA-F9851E562CAD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthSpa2.BackendServiceAcceptingToken", "AuthSpa2.BackendServiceAcceptingToken\AuthSpa2.BackendServiceAcceptingToken.csproj", "{17EDDC05-CD20-406F-B827-E9D5DC5F1D3C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,18 @@ Global
 		{20FA2453-4D61-48FB-A5FA-F9851E562CAD}.Release|x64.Build.0 = Release|Any CPU
 		{20FA2453-4D61-48FB-A5FA-F9851E562CAD}.Release|x86.ActiveCfg = Release|Any CPU
 		{20FA2453-4D61-48FB-A5FA-F9851E562CAD}.Release|x86.Build.0 = Release|Any CPU
+		{17EDDC05-CD20-406F-B827-E9D5DC5F1D3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17EDDC05-CD20-406F-B827-E9D5DC5F1D3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17EDDC05-CD20-406F-B827-E9D5DC5F1D3C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{17EDDC05-CD20-406F-B827-E9D5DC5F1D3C}.Debug|x64.Build.0 = Debug|Any CPU
+		{17EDDC05-CD20-406F-B827-E9D5DC5F1D3C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{17EDDC05-CD20-406F-B827-E9D5DC5F1D3C}.Debug|x86.Build.0 = Debug|Any CPU
+		{17EDDC05-CD20-406F-B827-E9D5DC5F1D3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17EDDC05-CD20-406F-B827-E9D5DC5F1D3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17EDDC05-CD20-406F-B827-E9D5DC5F1D3C}.Release|x64.ActiveCfg = Release|Any CPU
+		{17EDDC05-CD20-406F-B827-E9D5DC5F1D3C}.Release|x64.Build.0 = Release|Any CPU
+		{17EDDC05-CD20-406F-B827-E9D5DC5F1D3C}.Release|x86.ActiveCfg = Release|Any CPU
+		{17EDDC05-CD20-406F-B827-E9D5DC5F1D3C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

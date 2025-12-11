@@ -97,12 +97,17 @@ export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
   const protectedResourceMap = new Map<string, Array<string>>();
   
   // Add the backend API endpoint with required scopes
-  // Match any request to the weatherforecast endpoint
+  // Local development URLs (Aspire)
   protectedResourceMap.set('https://apiservice.dev.localhost:7001/*', [
     'api://1d922779-2742-4cf2-8c82-425cf2c60aa8/access_as_user'
   ]);
   
   protectedResourceMap.set('http://apiservice.dev.localhost:5001/*', [
+    'api://1d922779-2742-4cf2-8c82-425cf2c60aa8/access_as_user'
+  ]);
+
+  // Azure Container Apps URL (production)
+  protectedResourceMap.set('https://apiservice.agreeablemeadow-c2511ce0.eastus2.azurecontainerapps.io/*', [
     'api://1d922779-2742-4cf2-8c82-425cf2c60aa8/access_as_user'
   ]);
   

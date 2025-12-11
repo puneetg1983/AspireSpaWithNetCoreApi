@@ -11,9 +11,12 @@
   <ItemGroup>
     <ProjectReference Include="..\AuthSpa2.ApiService\AuthSpa2.ApiService.csproj" />
     <ProjectReference Include="..\AuthSpa2.BackendProtectedService\AuthSpa2.BackendProtectedService.csproj" />
+    <ProjectReference Include="..\AuthSpa2.BackendServiceAcceptingToken\AuthSpa2.BackendServiceAcceptingToken.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.Azure" Version="13.0.2" />
+    <PackageReference Include="Aspire.Hosting.Azure.AppContainers" Version="13.0.2" />
     <PackageReference Include="Aspire.Hosting.NodeJs" Version="9.5.2" />
   </ItemGroup>
 

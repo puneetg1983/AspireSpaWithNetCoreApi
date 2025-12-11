@@ -27,13 +27,25 @@ public class DataController : ControllerBase
             ?? User.FindFirst("oid")?.Value
             ?? "Unknown";
 
+        // Extract all claims
+        var claims = User.Claims.Select(c => new { Type = c.Type, Value = c.Value }).ToList();
+        
+        // Extract roles
+        var roles = User.Claims
+            .Where(c => c.Type == "roles" || c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role")
+            .Select(c => c.Value)
+            .ToList();
+
         _logger.LogInformation("BackendProtectedService: GetData called by {User} ({UserId})", userIdentity, userId);
 
         return Ok(new
         {
+            Service = "BackendProtectedService",
             Message = "This is protected data from BackendProtectedService",
             RequestedBy = userIdentity,
             UserId = userId,
+            Roles = roles,
+            Claims = claims,
             Timestamp = DateTime.UtcNow,
             Data = new[]
             {

@@ -1,0 +1,13 @@
+{
+  "apiUrl": "/api",
+  "msalConfig": {
+    "clientId": "1d922779-2742-4cf2-8c82-425cf2c60aa8",
+    "authority": "https://login.microsoftonline.com/common",
+    "redirectUri": "",
+    "scopes": [
+      "openid",
+      "profile",
+      "api://1d922779-2742-4cf2-8c82-425cf2c60aa8/access_as_user"
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+node_modules
+dist
+.angular
+.git
+.gitignore
+*.md
+*.log
+.env*
+ssl/
+*.pem
+*.crt
+*.key

@@ -1,0 +1,6 @@
+@AuthSpa2.BackendServiceAcceptingToken_HostAddress = http://localhost:5227
+
+GET {{AuthSpa2.BackendServiceAcceptingToken_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,8 +1,11 @@
 // Environment configuration for Angular app
-// In production, these values will be injected by Aspire
+// For Azure deployment, set the production API URL here
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5000', // Default API URL, will be overridden by Aspire
+  // API URL - change this for Azure deployment
+  // Local: '/api' (uses proxy or Aspire service discovery)
+  // Azure: 'https://apiservice.<your-env>.eastus2.azurecontainerapps.io'
+  apiUrl: 'https://apiservice.agreeablemeadow-c2511ce0.eastus2.azurecontainerapps.io',
   msalConfig: {
     clientId: '1d922779-2742-4cf2-8c82-425cf2c60aa8',
     authority: 'https://login.microsoftonline.com/common',

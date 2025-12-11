@@ -5,6 +5,7 @@ import { MsalService, MsalBroadcastService, MSAL_GUARD_CONFIG, MsalGuardConfigur
 import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { InteractionStatus, RedirectRequest } from '@azure/msal-browser';
+import { environment } from '../environments/environment';
 
 /**
  * Main App Component with MSAL Authentication
@@ -22,10 +23,13 @@ export class App implements OnInit, OnDestroy {
   userName = '';
   weatherData: any = null;
   backendData: any = null;
+  oboData: any = null;
   loading = false;
   loadingBackend = false;
+  loadingObo = false;
   error = '';
   backendError = '';
+  oboError = '';
   
   private readonly _destroying$ = new Subject<void>();
 
@@ -110,9 +114,8 @@ export class App implements OnInit, OnDestroy {
     this.error = '';
     this.weatherData = null;
 
-    // Get the API URL from environment or use default
-    // Using the Aspire-configured API service endpoint
-    const apiUrl = 'https://apiservice.dev.localhost:7001/weatherforecast';
+    // Use the API URL from environment config
+    const apiUrl = `${environment.apiUrl}/weatherforecast`;
 
     console.log('Calling API:', apiUrl);
 
@@ -143,7 +146,7 @@ export class App implements OnInit, OnDestroy {
     this.backendError = '';
     this.backendData = null;
 
-    const apiUrl = 'https://apiservice.dev.localhost:7001/backenddata';
+    const apiUrl = `${environment.apiUrl}/backenddata`;
 
     console.log('Calling Backend Service via API:', apiUrl);
 
@@ -159,6 +162,39 @@ export class App implements OnInit, OnDestroy {
           this.backendError = `Backend API Error: ${err.message || 'Unknown error'}`;
           this.loadingBackend = false;
           console.error('Backend service call failed:', err);
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  /**
+   * Call the OBO backend service via ApiService
+   * This demonstrates the On-Behalf-Of (OBO) flow:
+   * 1. User token is sent to ApiService
+   * 2. ApiService exchanges user token for OBO token (different audience)
+   * 3. OBO token is used to call BackendServiceAcceptingToken
+   */
+  callOboService(): void {
+    this.loadingObo = true;
+    this.oboError = '';
+    this.oboData = null;
+
+    const apiUrl = `${environment.apiUrl}/obodata`;
+
+    console.log('Calling OBO Service via API:', apiUrl);
+
+    this.http.get<any>(apiUrl)
+      .subscribe({
+        next: (data) => {
+          this.oboData = data;
+          this.loadingObo = false;
+          console.log('OBO Service Response:', data);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.oboError = `OBO API Error: ${err.message || 'Unknown error'}`;
+          this.loadingObo = false;
+          console.error('OBO service call failed:', err);
           this.cdr.detectChanges();
         }
       });
