@@ -185,8 +185,9 @@ app.MapGet("/obodata", async (HttpContext httpContext, IHttpClientFactory httpCl
             ?? "Anonymous";
 
         // Get the scopes for the downstream API from configuration
-        var scopes = configuration.GetSection("DownstreamApi:Scopes").Get<string[]>() 
-            ?? new[] { "api://626cfb4f-3edb-4ec4-9cd0-64126cfaea3b/access_as_user" };
+        var scopes = configuration.GetSection("DownstreamApi:Scopes").Get<string[]>();
+
+        ArgumentNullException.ThrowIfNull(scopes, "DownstreamApi:Scopes configuration is missing.");
 
         // Acquire a token on behalf of the user for the downstream API
         // This performs the OBO token exchange with Azure AD
