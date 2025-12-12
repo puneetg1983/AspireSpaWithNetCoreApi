@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthSpa2.BackendProtectedSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthSpa2.BackendServiceAcceptingToken", "AuthSpa2.BackendServiceAcceptingToken\AuthSpa2.BackendServiceAcceptingToken.csproj", "{17EDDC05-CD20-406F-B827-E9D5DC5F1D3C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthSpa2.Web", "AuthSpa2.Web\AuthSpa2.Web.csproj", "{B20D33F1-B92A-4832-AE6E-9D974548188A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,18 @@ Global
 		{17EDDC05-CD20-406F-B827-E9D5DC5F1D3C}.Release|x64.Build.0 = Release|Any CPU
 		{17EDDC05-CD20-406F-B827-E9D5DC5F1D3C}.Release|x86.ActiveCfg = Release|Any CPU
 		{17EDDC05-CD20-406F-B827-E9D5DC5F1D3C}.Release|x86.Build.0 = Release|Any CPU
+		{B20D33F1-B92A-4832-AE6E-9D974548188A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B20D33F1-B92A-4832-AE6E-9D974548188A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B20D33F1-B92A-4832-AE6E-9D974548188A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B20D33F1-B92A-4832-AE6E-9D974548188A}.Debug|x64.Build.0 = Debug|Any CPU
+		{B20D33F1-B92A-4832-AE6E-9D974548188A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B20D33F1-B92A-4832-AE6E-9D974548188A}.Debug|x86.Build.0 = Debug|Any CPU
+		{B20D33F1-B92A-4832-AE6E-9D974548188A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B20D33F1-B92A-4832-AE6E-9D974548188A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B20D33F1-B92A-4832-AE6E-9D974548188A}.Release|x64.ActiveCfg = Release|Any CPU
+		{B20D33F1-B92A-4832-AE6E-9D974548188A}.Release|x64.Build.0 = Release|Any CPU
+		{B20D33F1-B92A-4832-AE6E-9D974548188A}.Release|x86.ActiveCfg = Release|Any CPU
+		{B20D33F1-B92A-4832-AE6E-9D974548188A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

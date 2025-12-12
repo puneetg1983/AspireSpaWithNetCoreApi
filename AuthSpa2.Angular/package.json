@@ -3,11 +3,12 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "node serve.js",
-    "dev": "ng serve --port 4200 --host 0.0.0.0",
+    "start": "ng serve --port 4200 --host 0.0.0.0 --ssl --ssl-cert ssl/localhost.crt --ssl-key ssl/localhost.key",
+    "dev": "ng serve --port 4200 --host 0.0.0.0 --ssl --ssl-cert ssl/localhost.crt --ssl-key ssl/localhost.key",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "extract-cert": "node extract-cert.js"
   },
   "prettier": {
     "printWidth": 100,

@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, APP_INITIALIZER } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { 
@@ -22,6 +22,7 @@ import {
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { routes } from './app.routes';
+import { ConfigService } from './services/config.service';
 
 /**
  * MSAL Configuration for single Entra ID App Registration
@@ -92,24 +93,33 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
 /**
  * MSAL Interceptor Configuration
  * Automatically attaches access tokens to API calls
+ * 
+ * We use multiple URL patterns to cover:
+ * - Local development with Aspire (various localhost URLs)
+ * - Production Azure Container Apps URLs
  */
 export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
   const protectedResourceMap = new Map<string, Array<string>>();
+  const scopes = ['api://1d922779-2742-4cf2-8c82-425cf2c60aa8/access_as_user'];
   
-  // Add the backend API endpoint with required scopes
-  // Local development URLs (Aspire)
-  protectedResourceMap.set('https://apiservice.dev.localhost:7001/*', [
-    'api://1d922779-2742-4cf2-8c82-425cf2c60aa8/access_as_user'
-  ]);
+  // Local development URLs - specific ports used by Aspire
+  // API Service ports
+  protectedResourceMap.set('https://localhost:7001/*', scopes);
+  protectedResourceMap.set('http://localhost:5001/*', scopes);
   
-  protectedResourceMap.set('http://apiservice.dev.localhost:5001/*', [
-    'api://1d922779-2742-4cf2-8c82-425cf2c60aa8/access_as_user'
-  ]);
+  // Additional common localhost ports for flexibility
+  protectedResourceMap.set('https://localhost:7000/*', scopes);
+  protectedResourceMap.set('https://localhost:7002/*', scopes);
+  protectedResourceMap.set('https://localhost:5000/*', scopes);
+  protectedResourceMap.set('https://localhost:5001/*', scopes);
+  
+  // Aspire dev proxy patterns (specific hostnames)
+  protectedResourceMap.set('https://apiservice.dev.localhost:7001/*', scopes);
+  protectedResourceMap.set('http://apiservice.dev.localhost:5001/*', scopes);
 
-  // Azure Container Apps URL (production)
-  protectedResourceMap.set('https://apiservice.agreeablemeadow-c2511ce0.eastus2.azurecontainerapps.io/*', [
-    'api://1d922779-2742-4cf2-8c82-425cf2c60aa8/access_as_user'
-  ]);
+  // Azure Container Apps URLs (production)
+  // This pattern covers any Azure Container Apps environment
+  protectedResourceMap.set('https://apiservice.*.azurecontainerapps.io/*', scopes);
   
   return {
     interactionType: InteractionType.Redirect,
@@ -117,11 +127,27 @@ export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
   };
 }
 
+/**
+ * Factory function to initialize the ConfigService before the app starts.
+ * This ensures configuration is loaded before any components try to use it.
+ */
+export function initializeConfig(configService: ConfigService): () => Promise<void> {
+  return () => configService.loadConfig();
+}
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideHttpClient(withInterceptorsFromDi()),
+    // Initialize ConfigService before the app starts
+    ConfigService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeConfig,
+      deps: [ConfigService],
+      multi: true
+    },
     {
       provide: MSAL_INSTANCE,
       useFactory: MSALInstanceFactory

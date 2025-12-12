@@ -9,6 +9,18 @@ var builder = WebApplication.CreateBuilder(args);
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 
+// Disable scope validation in Development to work around Microsoft.Identity.Web DI scope issue
+// This is a known issue when combining MISE with DownstreamApi
+// In Production, scope validation is disabled by default anyway
+if (builder.Environment.IsDevelopment())
+{
+    builder.Host.UseDefaultServiceProvider(options =>
+    {
+        options.ValidateScopes = false;
+        options.ValidateOnBuild = false;
+    });
+}
+
 // Add MISE authentication
 builder.Services.AddAuthentication(MiseAuthenticationDefaults.AuthenticationScheme)
     .AddMiseWithDefaultModules(builder.Configuration);

@@ -5,7 +5,7 @@ import { MsalService, MsalBroadcastService, MSAL_GUARD_CONFIG, MsalGuardConfigur
 import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { InteractionStatus, RedirectRequest } from '@azure/msal-browser';
-import { environment } from '../environments/environment';
+import { ConfigService } from './services/config.service';
 
 /**
  * Main App Component with MSAL Authentication
@@ -38,7 +38,8 @@ export class App implements OnInit, OnDestroy {
     private authService: MsalService,
     private msalBroadcastService: MsalBroadcastService,
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private configService: ConfigService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -114,8 +115,8 @@ export class App implements OnInit, OnDestroy {
     this.error = '';
     this.weatherData = null;
 
-    // Use the API URL from environment config
-    const apiUrl = `${environment.apiUrl}/weatherforecast`;
+    // Use the API URL from ConfigService (loaded from backend)
+    const apiUrl = `${this.configService.apiUrl}/weatherforecast`;
 
     console.log('Calling API:', apiUrl);
 
@@ -146,7 +147,7 @@ export class App implements OnInit, OnDestroy {
     this.backendError = '';
     this.backendData = null;
 
-    const apiUrl = `${environment.apiUrl}/backenddata`;
+    const apiUrl = `${this.configService.apiUrl}/backenddata`;
 
     console.log('Calling Backend Service via API:', apiUrl);
 
@@ -179,7 +180,7 @@ export class App implements OnInit, OnDestroy {
     this.oboError = '';
     this.oboData = null;
 
-    const apiUrl = `${environment.apiUrl}/obodata`;
+    const apiUrl = `${this.configService.apiUrl}/obodata`;
 
     console.log('Calling OBO Service via API:', apiUrl);
 

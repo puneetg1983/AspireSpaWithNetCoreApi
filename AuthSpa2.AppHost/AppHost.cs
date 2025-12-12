@@ -27,12 +27,20 @@ var apiService = builder.AddProject<Projects.AuthSpa2_ApiService>("apiservice")
     .WithReference(backendServiceAcceptingToken)
     .WithAzureUserAssignedIdentity(oboManagedIdentity);
 
-// Angular SPA with MSAL.js authentication
-// Containerized for deployment to Azure Container Apps
-var angularApp = builder.AddDockerfile("angular-spa", "../AuthSpa2.Angular")
-    .WithHttpEndpoint(targetPort: 80)
+// Angular SPA with .NET Core hosting
+// - Local development: Aspire launches the npm dev server, Web project proxies to it
+// - Production/Deployment: Angular dist files are built and served via UseStaticFiles()
+var angularApp = builder.AddNpmApp("angular-spa", "../AuthSpa2.Angular", "dev")
+    .WithHttpsEndpoint(port: 4200, targetPort: 4200, isProxied: false)
     .WithExternalHttpEndpoints()
-    .WithReference(apiService)
-    .WithEnvironment("API_URL", apiService.GetEndpoint("http"));
+    .WithReference(apiService);
+
+// .NET Core host for Angular SPA
+// In development: Uses SpaProxy to forward requests to Angular dev server
+// In production: Serves Angular dist files from wwwroot
+var webHost = builder.AddProject<Projects.AuthSpa2_Web>("web")
+    .WithHttpHealthCheck("/health")
+    .WithExternalHttpEndpoints()
+    .WithReference(apiService);
 
 builder.Build().Run();

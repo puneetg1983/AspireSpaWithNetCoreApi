@@ -1,11 +1,11 @@
 // Environment configuration for Angular app
-// For Azure deployment, set the production API URL here
+// NOTE: API URL is now loaded dynamically from /api/config endpoint at runtime
+// This file is kept for reference and as a fallback for MSAL configuration
 export const environment = {
   production: false,
-  // API URL - change this for Azure deployment
-  // Local: '/api' (uses proxy or Aspire service discovery)
-  // Azure: 'https://apiservice.<your-env>.eastus2.azurecontainerapps.io'
-  apiUrl: 'https://apiservice.agreeablemeadow-c2511ce0.eastus2.azurecontainerapps.io',
+  // API URL is now dynamically loaded via ConfigService from the backend
+  // The backend uses Aspire service discovery in development
+  // and ServiceUrls configuration in production
   msalConfig: {
     clientId: '1d922779-2742-4cf2-8c82-425cf2c60aa8',
     authority: 'https://login.microsoftonline.com/common',

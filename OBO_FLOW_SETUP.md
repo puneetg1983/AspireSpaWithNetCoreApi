@@ -60,7 +60,7 @@ Using **Federated Credentials with Managed Identity** instead of client secrets 
 
 | Name | Client ID | Purpose |
 |------|-----------|---------|
-| obo-managed-identity (Aspire-created) | 6944dfb0-2143-4a53-8990-c0e3cd9670fe | Federated credential for OBO |
+| obo-managed-identity (Aspire-created) | 04cc4d5c-b62a-43c1-a621-ac568dadf3e3 | Federated credential for OBO |
 
 ---
 
@@ -76,7 +76,7 @@ Using **Federated Credentials with Managed Identity** instead of client secrets 
    - **Region**: Your region
    - **Name**: `AspireOboTestManagedIdentity`
 4. Click **Review + create** → **Create**
-5. **Note the Object ID**: `6944dfb0-2143-4a53-8990-c0e3cd9670fe`
+5. **Note the Object ID**: `04cc4d5c-b62a-43c1-a621-ac568dadf3e3`
 
 ### Step 2: Configure Federated Credential on Original App (1d922779-...)
 
@@ -94,7 +94,7 @@ Using **Federated Credentials with Managed Identity** instead of client secrets 
 
 The configuration will show:
 - **Issuer**: `https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/v2.0`
-- **Subject identifier**: `6944dfb0-2143-4a53-8990-c0e3cd9670fe` (Managed Identity Client ID)
+- **Subject identifier**: `04cc4d5c-b62a-43c1-a621-ac568dadf3e3` (Managed Identity Client ID)
 
 ### Step 3: Configure the OBO Target App (626cfb4f-...)
 
@@ -179,7 +179,7 @@ This allows OBO flow without requiring user consent for the downstream API.
     "ClientCredentials": [
       {
         "SourceType": "SignedAssertionFromManagedIdentity",
-        "ManagedIdentityClientId": "6944dfb0-2143-4a53-8990-c0e3cd9670fe",
+        "ManagedIdentityClientId": "04cc4d5c-b62a-43c1-a621-ac568dadf3e3",
         "TokenExchangeUrl": "api://AzureADTokenExchange"
       }
     ]
@@ -196,7 +196,7 @@ This allows OBO flow without requiring user consent for the downstream API.
 | Property | Value | Description |
 |----------|-------|-------------|
 | `SourceType` | `SignedAssertionFromManagedIdentity` | Uses Managed Identity for authentication |
-| `ManagedIdentityClientId` | `6944dfb0-2143-4a53-8990-c0e3cd9670fe` | Client ID of the Managed Identity |
+| `ManagedIdentityClientId` | `04cc4d5c-b62a-43c1-a621-ac568dadf3e3` | Client ID of the Managed Identity |
 | `TokenExchangeUrl` | `api://AzureADTokenExchange` | Standard audience for federated token exchange |
 
 ### BackendServiceAcceptingToken/appsettings.json
@@ -276,7 +276,7 @@ Update the configuration to allow fallback to Azure CLI credentials:
     "ClientCredentials": [
       {
         "SourceType": "SignedAssertionFromManagedIdentity",
-        "ManagedIdentityClientId": "6944dfb0-2143-4a53-8990-c0e3cd9670fe",
+        "ManagedIdentityClientId": "04cc4d5c-b62a-43c1-a621-ac568dadf3e3",
         "TokenExchangeUrl": "api://AzureADTokenExchange"
       }
     ]
@@ -402,7 +402,7 @@ When deploying to Azure (e.g., Container Apps, App Service):
    az containerapp identity assign \
      --name your-api-service \
      --resource-group your-rg \
-     --user-assigned 6944dfb0-2143-4a53-8990-c0e3cd9670fe
+     --user-assigned 04cc4d5c-b62a-43c1-a621-ac568dadf3e3
    ```
 
 2. The `ManagedIdentityClientId` in configuration should match the Managed Identity's **Object ID**
